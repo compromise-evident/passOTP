@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/compromise-evident/falseOTP/main/Other/falseOTP_icon_3f96b83c817b29a752b375ca8f1bef44.png" width="100">
+  <img src="https://raw.githubusercontent.com/compromise-evident/falseOTP/main/Other/falseOTP_icon_3f96b83c817b29a752b375ca8f1bef44.png" width="50">
 </p>
 
 <p align="center">
