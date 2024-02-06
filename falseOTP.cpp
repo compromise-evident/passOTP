@@ -2,7 +2,7 @@
 ///            (no password is rejected--giving false plausibility.)
 
 
-// Version 3.0.0   +   rolling-code 3.1.0
+// Version 3.0.1   +   rolling-code 3.1.0
 
 #include <fstream>
 #include <iostream>
@@ -130,6 +130,20 @@ int main()
 	int actual_key[1000000] = {0}; //..........Becomes actual key based on password (filled with randomness 0 - 255, renewed for each MB of the file.)
 	unsigned int randomness  [1000] = {0};
 	
+	//Gets file size in MB for displaying "x of y MB...".
+	in_stream.open(path_to_file);
+	char garbage_byte;
+	long long total_bytes = 0;
+	in_stream.get(garbage_byte);
+	for(; in_stream.eof() == false;)
+	{	in_stream.get(garbage_byte);
+		total_bytes++;
+	}
+	in_stream.close();
+	
+	long long total_MB = (total_bytes - (total_bytes % 1000000));
+	total_MB /= 1000000;
+	
 	
 	
 	
@@ -152,7 +166,7 @@ int main()
 		int  one_million_counter = 0;
 		bool first_run = true;
 		in_stream.get(garbage_byte);
-		for(; in_stream.eof() == false;)
+		for(long long MB_done = 0; in_stream.eof() == false;)
 		{	//..........Makes new actual key.
 			if(one_million_counter == 0)
 			{	int actual_key_write_bookmark = 0;
@@ -225,7 +239,7 @@ int main()
 			
 			file_size_for_overwriting++;
 			one_million_counter++;
-			if(one_million_counter == 1000000) {one_million_counter = 0;}
+			if(one_million_counter == 1000000) {one_million_counter = 0; MB_done++; cout << MB_done << " of " << total_MB << " MB...\n";}
 			in_stream.get(garbage_byte);
 		}
 		in_stream.close();
@@ -266,7 +280,7 @@ int main()
 		int  one_million_counter = 0;
 		bool first_run = true;
 		in_stream.get(garbage_byte);
-		for(; in_stream.eof() == false;)
+		for(long long MB_done = 0; in_stream.eof() == false;)
 		{	//..........Makes new actual key.
 			if(one_million_counter == 0)
 			{	int actual_key_write_bookmark = 0;
@@ -349,7 +363,7 @@ int main()
 			
 			file_size_for_overwriting++;
 			one_million_counter++;
-			if(one_million_counter == 1000000) {one_million_counter = 0;}
+			if(one_million_counter == 1000000) {one_million_counter = 0; MB_done++; cout << MB_done << " of " << total_MB << " MB...\n";}
 			in_stream.get(garbage_byte);
 		}
 		in_stream.close();
