@@ -1,5 +1,6 @@
 /// falseOTP - One-time pad for file encryption with password                   Run it: "apt install g++ geany". Open this in Geany. Hit F9 once. F5 to run.
-///            (no password is rejected--giving false plausibility.)
+///            (no password is rejected upon decryption--
+///            giving false plausibility.)
 
 
 // Version 3.0.1   +   rolling-code 3.1.0
