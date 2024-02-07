@@ -3,7 +3,7 @@
 ///            giving false plausibility.)
 
 
-// Version 3.0.1   +   rolling-code 3.1.0
+// Version 3.0.2   +   rolling-code 3.1.0
 
 #include <fstream>
 #include <iostream>
@@ -92,7 +92,7 @@ int main()
 	int path_to_file_null_bookmark;
 	for(int a = 0; a < 10000; a++) {if(path_to_file[a] == '\0') {path_to_file_null_bookmark = a; break;}}
 	
-	//Gets a copy of path_to_file[] in case overwriting raw file.
+	//Gets a copy of path_to_file[] in case overwriting raw file after encryption.
 	char path_to_file_copy_if_overwriting_raw[10000];
 	for(int a = 0; a < 10000; a++) {path_to_file_copy_if_overwriting_raw[a] = path_to_file[a];}
 	long long file_size_for_overwriting = 0;
@@ -128,8 +128,8 @@ int main()
 		actual_seeds[a] = (temp_overflow_for_randomness % 4294967296);
 	}
 	
-	int actual_key[1000000] = {0}; //..........Becomes actual key based on password (filled with randomness 0 - 255, renewed for each MB of the file.)
-	unsigned int randomness  [1000] = {0};
+	int          actual_key[1000] = {0}; //..........Becomes actual key based on password (filled with randomness 0 - 255, renewed for each kB of the file.)
+	unsigned int randomness[1000] = {0};
 	
 	//Gets file size in MB for displaying "x of y MB...".
 	in_stream.open(path_to_file);
@@ -144,6 +144,7 @@ int main()
 	
 	long long total_MB = (total_bytes - (total_bytes % 1000000));
 	total_MB /= 1000000;
+	cout << "\n";
 	
 	
 	
@@ -164,59 +165,56 @@ int main()
 		//Encrypts.
 		char garbage_byte;
 		int  garbage_byte_normal;
-		int  one_million_counter = 0;
-		bool first_run = true;
+		int  one_thousand_counter = 0;
+		int  one_million_counter  = 0;
 		in_stream.get(garbage_byte);
 		for(long long MB_done = 0; in_stream.eof() == false;)
 		{	//..........Makes new actual key.
-			if(one_million_counter == 0)
-			{	int actual_key_write_bookmark = 0;
-				if(first_run == true) {cout << "\nBuilding actual_key...\n";}
+			if(one_thousand_counter == 0)
+			{	
 				
 				
 				
 				
+				//..........Fills int actual_key[1000] with new randomness (0 to 255.)
+				//..........(Exactly the same for encrypt & decrypt.) Each kB of file consumes entire actual_key[].
+				//..........The following block verbatim from rolling-code.cpp, except for absurd_protection_against_cryptanalysis & extracting rand.
 				
-				//..........Fills int actual_key[1000000] with new randomness (0 to 255.)
-				//..........(Exactly the same for encrypt & decrypt.) Each MB of file consumes entire actual_key[].
-				for(int a = 0; a < 1000; a++)
-				{	//..........The following block verbatim from rolling-code.cpp, except for absurd_protection_against_cryptanalysis & extracting rand.
-					//..........Generator powerhouse.
-					for(int b = 0; b < 100; b++)
-					{	srand(actual_seeds[b]);
-						for(int c = 0; c < 1000; c++) {randomness[c] += rand(); randomness[c] %= 256;} //..........Fills randomness[] (100x per 1,000-char code.)
-						temp_overflow_for_randomness = (actual_seeds[99 - b] + rand()); //..........Modifies inverse actual_seeds[].
-						actual_seeds[99 - b] = (temp_overflow_for_randomness % 4294967296);
-						
-						srand(actual_seeds[99 - b]);  //..........Now using that inverse seed.
-						for(int c = 0; c < 1000; c++) //..........Swaps EACH & EVERY element in randomness[] with randomly chosen (100,000x per 1,000-char code.)
-						{	int random_element = (rand() % 1000);
-							for(; random_element == c;) {random_element = (rand() % 1000);}
-							
-							unsigned int temp_element = randomness[random_element];
-							randomness[random_element] = randomness[c];
-							randomness[c] = temp_element;
-						}
-						temp_overflow_for_randomness = (actual_seeds[b] + rand()); //..........Modifies current actual_seeds[].
-						actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
-					}
+				//..........Generator powerhouse.
+				for(int b = 0; b < 100; b++)
+				{	srand(actual_seeds[b]);
+					for(int c = 0; c < 1000; c++) {randomness[c] += rand(); randomness[c] %= 256;} //..........Fills randomness[] (100x per 1,000-char code.)
+					temp_overflow_for_randomness = (actual_seeds[99 - b] + rand()); //..........Modifies inverse actual_seeds[].
+					actual_seeds[99 - b] = (temp_overflow_for_randomness % 4294967296);
 					
-					//..........Makes 100 10-digit new actual seeds based on randomness[]. (!!! Adds to current actual_seeds. !!! The generated Code is NOT alone responsible for new actual_seeds. !!!) (Strings together 10 contiguous digits, 100 times.)
-					int randomness_read_bookmark = 0;
-					for(int b = 0; b < 100; b++)
-					{	temp_overflow_for_randomness = 0;
-						for(int c = 0; c < 10; c++)
-						{	temp_overflow_for_randomness += (randomness[randomness_read_bookmark] % 10);
-							if(c < 9) {temp_overflow_for_randomness *= 10;}
-							randomness_read_bookmark++;
-						}
+					srand(actual_seeds[99 - b]);  //..........Now using that inverse seed.
+					for(int c = 0; c < 1000; c++) //..........Swaps EACH & EVERY element in randomness[] with randomly chosen (100,000x per 1,000-char code.)
+					{	int random_element = (rand() % 1000);
+						for(; random_element == c;) {random_element = (rand() % 1000);}
 						
-						temp_overflow_for_randomness += actual_seeds[b];
-						actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
+						unsigned int temp_element = randomness[random_element];
+						randomness[random_element] = randomness[c];
+						randomness[c] = temp_element;
 					}
-					
-					for(int b = 0; b < 1000; b++) {actual_key[actual_key_write_bookmark] = randomness[b]; actual_key_write_bookmark++;}
+					temp_overflow_for_randomness = (actual_seeds[b] + rand()); //..........Modifies current actual_seeds[].
+					actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
 				}
+				
+				//..........Makes 100 10-digit new actual seeds based on randomness[]. (!!! Adds to current actual_seeds. !!! The generated Code is NOT alone responsible for new actual_seeds. !!!) (Strings together 10 contiguous digits, 100 times.)
+				int randomness_read_bookmark = 0;
+				for(int b = 0; b < 100; b++)
+				{	temp_overflow_for_randomness = 0;
+					for(int c = 0; c < 10; c++)
+					{	temp_overflow_for_randomness += (randomness[randomness_read_bookmark] % 10);
+						if(c < 9) {temp_overflow_for_randomness *= 10;}
+						randomness_read_bookmark++;
+					}
+					
+					temp_overflow_for_randomness += actual_seeds[b];
+					actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
+				}
+				
+				for(int b = 0; b < 1000; b++) {actual_key[b] = randomness[b];}
 				
 				
 				
@@ -224,14 +222,12 @@ int main()
 				
 			}
 			
-			if(first_run == true) {cout << "Encrypting...\n"; first_run = false;}
-			
 			//..........Makes byte normal.
 			garbage_byte_normal = garbage_byte;
 			if(garbage_byte_normal < 0) {garbage_byte_normal += 256;}
 			
 			//..........Encrypts byte.
-			garbage_byte_normal += actual_key[one_million_counter];
+			garbage_byte_normal += actual_key[one_thousand_counter];
 			garbage_byte_normal %= 256;
 			
 			//..........Writes byte to file.
@@ -239,8 +235,10 @@ int main()
 			else                          {out_stream.put(garbage_byte_normal - 256);}
 			
 			file_size_for_overwriting++;
+			one_thousand_counter++;
 			one_million_counter++;
-			if(one_million_counter == 1000000) {one_million_counter = 0; MB_done++; cout << MB_done << " of " << total_MB << " MB...\n";}
+			if(one_thousand_counter ==    1000) {one_thousand_counter = 0                                                                ;}
+			if(one_million_counter  == 1000000) {one_million_counter  = 0; MB_done++; cout << MB_done << " of " << total_MB << " MB...\n";}
 			in_stream.get(garbage_byte);
 		}
 		in_stream.close();
@@ -255,90 +253,79 @@ int main()
 	if(user_option == 2)
 	{	//Prepares two file streams.
 		in_stream.open(path_to_file);
-		if((path_to_file[path_to_file_null_bookmark - 6] == '.')
-		&& (path_to_file[path_to_file_null_bookmark - 5] == 'f')
-		&& (path_to_file[path_to_file_null_bookmark - 4] == 'a')
-		&& (path_to_file[path_to_file_null_bookmark - 3] == 'l')
-		&& (path_to_file[path_to_file_null_bookmark - 2] == 's')
-		&& (path_to_file[path_to_file_null_bookmark - 1] == 'e'))
-		{
-			path_to_file[path_to_file_null_bookmark - 6] = '\0'; //..........Truncates ".false" if present.
-		}
-		else
-		{	path_to_file[path_to_file_null_bookmark    ] = '.'; //..........Appends ".custom" if ".false" not present. Here, the user is decrypting
-			path_to_file[path_to_file_null_bookmark + 1] = 'c'; //..........something completely renamed or that which has never been encrypted.
-			path_to_file[path_to_file_null_bookmark + 2] = 'u'; //..........(Unsuspecting deniability and secrecy for sharing n in plain sight.)
-			path_to_file[path_to_file_null_bookmark + 3] = 's';
-			path_to_file[path_to_file_null_bookmark + 4] = 't';
-			path_to_file[path_to_file_null_bookmark + 5] = 'o';
-			path_to_file[path_to_file_null_bookmark + 6] = 'm';
-		}
+		path_to_file[path_to_file_null_bookmark     ] = ' '; //..........Appends " (decrypted)" to file name.
+		path_to_file[path_to_file_null_bookmark +  1] = '(';
+		path_to_file[path_to_file_null_bookmark +  2] = 'd';
+		path_to_file[path_to_file_null_bookmark +  3] = 'e';
+		path_to_file[path_to_file_null_bookmark +  4] = 'c';
+		path_to_file[path_to_file_null_bookmark +  5] = 'r';
+		path_to_file[path_to_file_null_bookmark +  6] = 'y';
+		path_to_file[path_to_file_null_bookmark +  7] = 'p';
+		path_to_file[path_to_file_null_bookmark +  8] = 't';
+		path_to_file[path_to_file_null_bookmark +  9] = 'e';
+		path_to_file[path_to_file_null_bookmark + 10] = 'd';
+		path_to_file[path_to_file_null_bookmark + 11] = ')';
 		out_stream.open(path_to_file);
 		
 		//Decrypts.
 		char garbage_byte;
 		int  garbage_byte_normal;
-		int  one_million_counter = 0;
-		bool first_run = true;
+		int  one_thousand_counter = 0;
+		int  one_million_counter  = 0;
 		in_stream.get(garbage_byte);
 		for(long long MB_done = 0; in_stream.eof() == false;)
 		{	//..........Makes new actual key.
-			if(one_million_counter == 0)
-			{	int actual_key_write_bookmark = 0;
-				if(first_run == true) {cout << "\nBuilding actual_key...\n";}
+			if(one_thousand_counter == 0)
+			{	
 				
 				
 				
 				
+				//..........Fills int actual_key[1000] with new randomness (0 to 255.)
+				//..........(Exactly the same for encrypt & decrypt.) Each kB of file consumes entire actual_key[].
+				//..........The following block verbatim from rolling-code.cpp, except for absurd_protection_against_cryptanalysis & extracting rand.
 				
-				//..........Fills int actual_key[1000000] with new randomness (0 to 255.)
-				//..........(Exactly the same for encrypt & decrypt.) Each MB of file consumes entire actual_key[].
-				for(int a = 0; a < 1000; a++)
-				{	//..........The following block verbatim from rolling-code.cpp, except for absurd_protection_against_cryptanalysis & extracting rand.
-					//..........Generator powerhouse.
-					for(int b = 0; b < 100; b++)
-					{	srand(actual_seeds[b]);
-						for(int c = 0; c < 1000; c++) {randomness[c] += rand(); randomness[c] %= 256;} //..........Fills randomness[] (100x per 1,000-char code.)
-						temp_overflow_for_randomness = (actual_seeds[99 - b] + rand()); //..........Modifies inverse actual_seeds[].
-						actual_seeds[99 - b] = (temp_overflow_for_randomness % 4294967296);
-						
-						srand(actual_seeds[99 - b]);  //..........Now using that inverse seed.
-						for(int c = 0; c < 1000; c++) //..........Swaps EACH & EVERY element in randomness[] with randomly chosen (100,000x per 1,000-char code.)
-						{	int random_element = (rand() % 1000);
-							for(; random_element == c;) {random_element = (rand() % 1000);}
-							
-							unsigned int temp_element = randomness[random_element];
-							randomness[random_element] = randomness[c];
-							randomness[c] = temp_element;
-						}
-						temp_overflow_for_randomness = (actual_seeds[b] + rand()); //..........Modifies current actual_seeds[].
-						actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
-					}
+				//..........Generator powerhouse.
+				for(int b = 0; b < 100; b++)
+				{	srand(actual_seeds[b]);
+					for(int c = 0; c < 1000; c++) {randomness[c] += rand(); randomness[c] %= 256;} //..........Fills randomness[] (100x per 1,000-char code.)
+					temp_overflow_for_randomness = (actual_seeds[99 - b] + rand()); //..........Modifies inverse actual_seeds[].
+					actual_seeds[99 - b] = (temp_overflow_for_randomness % 4294967296);
 					
-					//..........Makes 100 10-digit new actual seeds based on randomness[]. (!!! Adds to current actual_seeds. !!! The generated Code is NOT alone responsible for new actual_seeds. !!!) (Strings together 10 contiguous digits, 100 times.)
-					int randomness_read_bookmark = 0;
-					for(int b = 0; b < 100; b++)
-					{	temp_overflow_for_randomness = 0;
-						for(int c = 0; c < 10; c++)
-						{	temp_overflow_for_randomness += (randomness[randomness_read_bookmark] % 10);
-							if(c < 9) {temp_overflow_for_randomness *= 10;}
-							randomness_read_bookmark++;
-						}
+					srand(actual_seeds[99 - b]);  //..........Now using that inverse seed.
+					for(int c = 0; c < 1000; c++) //..........Swaps EACH & EVERY element in randomness[] with randomly chosen (100,000x per 1,000-char code.)
+					{	int random_element = (rand() % 1000);
+						for(; random_element == c;) {random_element = (rand() % 1000);}
 						
-						temp_overflow_for_randomness += actual_seeds[b];
-						actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
+						unsigned int temp_element = randomness[random_element];
+						randomness[random_element] = randomness[c];
+						randomness[c] = temp_element;
 					}
-					
-					for(int b = 0; b < 1000; b++) {actual_key[actual_key_write_bookmark] = randomness[b]; actual_key_write_bookmark++;}
+					temp_overflow_for_randomness = (actual_seeds[b] + rand()); //..........Modifies current actual_seeds[].
+					actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
 				}
+				
+				//..........Makes 100 10-digit new actual seeds based on randomness[]. (!!! Adds to current actual_seeds. !!! The generated Code is NOT alone responsible for new actual_seeds. !!!) (Strings together 10 contiguous digits, 100 times.)
+				int randomness_read_bookmark = 0;
+				for(int b = 0; b < 100; b++)
+				{	temp_overflow_for_randomness = 0;
+					for(int c = 0; c < 10; c++)
+					{	temp_overflow_for_randomness += (randomness[randomness_read_bookmark] % 10);
+						if(c < 9) {temp_overflow_for_randomness *= 10;}
+						randomness_read_bookmark++;
+					}
+					
+					temp_overflow_for_randomness += actual_seeds[b];
+					actual_seeds[b] = (temp_overflow_for_randomness % 4294967296);
+				}
+				
+				for(int b = 0; b < 1000; b++) {actual_key[b] = randomness[b];}
 				
 				
 				
 				
 				
 			}
-			
-			if(first_run == true) {cout << "Decrypting...\n"; first_run = false;}
 			
 			//..........Makes byte normal.
 			garbage_byte_normal = garbage_byte;
@@ -351,11 +338,11 @@ int main()
 			    |   then plainfile = (cipherfile - sub-key)    |    plainfile = ((256 - sub-key) + cipherfile)  |
 			    |______________________________________________|________________________________________________|
 			*/
-			if(actual_key[one_million_counter] <= garbage_byte_normal)
-			{	garbage_byte_normal = (garbage_byte_normal - actual_key[one_million_counter]);
+			if(actual_key[one_thousand_counter] <= garbage_byte_normal)
+			{	garbage_byte_normal = (garbage_byte_normal - actual_key[one_thousand_counter]);
 			}
 			else
-			{	garbage_byte_normal = ((256 - actual_key[one_million_counter]) + garbage_byte_normal);
+			{	garbage_byte_normal = ((256 - actual_key[one_thousand_counter]) + garbage_byte_normal);
 			}
 			
 			//..........Writes byte to file.
@@ -363,8 +350,10 @@ int main()
 			else                            {out_stream.put(garbage_byte_normal - 256);}
 			
 			file_size_for_overwriting++;
+			one_thousand_counter++;
 			one_million_counter++;
-			if(one_million_counter == 1000000) {one_million_counter = 0; MB_done++; cout << MB_done << " of " << total_MB << " MB...\n";}
+			if(one_thousand_counter ==    1000) {one_thousand_counter = 0                                                                ;}
+			if(one_million_counter  == 1000000) {one_million_counter  = 0; MB_done++; cout << MB_done << " of " << total_MB << " MB...\n";}
 			in_stream.get(garbage_byte);
 		}
 		in_stream.close();
@@ -394,15 +383,15 @@ int main()
 	//..........Overwrites RAM of array unsigned int actual_seeds[100].
 	for(int a = 0; a < 100; a++) {actual_seeds[a] = 0; actual_seeds[a] = 4294967295;}
 	
-	//..........Overwrites RAM of array int actual_key[1000000].
-	for(int a = 0; a < 1000000; a++) {actual_key[a] = 0; actual_key[a] = -2147483648; actual_key[a] = 2147483647;}
+	//..........Overwrites RAM of array int actual_key[1000].
+	for(int a = 0; a < 1000; a++) {actual_key[a] = 0; actual_key[a] = -2147483648; actual_key[a] = 2147483647;}
 	
 	//..........Overwrites RAM of array unsigned int randomness[1000].
 	for(int a = 0; a < 1000; a++) {randomness[a] = 0; randomness[a] = 4294967295;}
 	
 	//..........Asks to overwrite the plainfile file after encryption.
 	if(user_option == 1)
-	{	cout << "\nDone! Overwrite plainfile? y/n: ";
+	{	cout << "Done! Overwrite plainfile? y/n: ";
 		char wait; cin >> wait;
 		
 		if(wait == 'y')
@@ -418,12 +407,12 @@ int main()
 	
 	//..........Asks to overwrite the plainfile file after decryption, giving the user a moment to observe or transfer it first.
 	if(user_option == 2)
-	{	cout << "\nDone! Now is your chance to observe or copy the plainfile\n"
+	{	cout << "Done! Now is your chance to observe or copy the plainfile\n"
 		     << "onto external devices so that it can be heavily\n"
 		     << "overwritten here. Continue? y/n: ";
 		char wait; cin >> wait;
 		
-		if(wait == 'y') //..........Note the difference here--original path to file.
+		if(wait == 'y') //..........Note the difference here--original (non-copy) path_to_file[] that was appended to in decrypt.
 		{	out_stream.open(path_to_file);
 			for(int a = 0; a < file_size_for_overwriting; a++) {out_stream << '\0';} out_stream.close(); //Binary: 00000000.
 			out_stream.open(path_to_file);
