@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/compromise-evident/falseOTP/main/Other/Terminal_641e1f912ab957c8bbfe8ae2849fe37d.png">
+  <img src="https://raw.githubusercontent.com/compromise-evident/passOTP/main/Other/Terminal_641e1f912ab957c8bbfe8ae2849fe37d.png">
 </p>
 
 <p align="center">
@@ -12,7 +12,7 @@
 # Perfect secrecy proof
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/compromise-evident/falseOTP/main/Other/Perfect_secrecy_proof.png">
+  <img src="https://raw.githubusercontent.com/compromise-evident/passOTP/main/Other/Perfect_secrecy_proof.png">
 </p>
 
 <sup>Original discoverer of the One-time pad (perfect secrecy) is not mentioned as I had independently rediscovered it ~December 2019</sup>
