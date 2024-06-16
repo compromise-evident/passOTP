@@ -15,4 +15,4 @@
   <img src="https://raw.githubusercontent.com/compromise-evident/falseOTP/main/Other/Perfect_secrecy_proof.png">
 </p>
 
-(Original discoverer of the OTP is not mentioned because I had independently rediscovered it ~December 2019.)
+Original discoverer of the OTP is not mentioned as I had independently rediscovered it ~December 2019.
