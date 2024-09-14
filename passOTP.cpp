@@ -1,4 +1,4 @@
-/// passOTP - One-time pad for file encryption with password.                   Run it: "apt install g++ geany". Open this in Geany. Hit F9 once. F5 to run.
+/// passOTP - One-time pad for file encryption with password.                   Run it: "apt install g++ geany". Open the .cpp in Geany. Hit F9 once. F5 to run.
 
 
 // Version 3.0.2   +   rolling-code 3.1.1
