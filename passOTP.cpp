@@ -344,7 +344,7 @@ int main()
 			
 			//..........Writes byte to file.
 			if(garbage_byte_normal < 128) {out_stream.put(garbage_byte_normal      );}
-			else                            {out_stream.put(garbage_byte_normal - 256);}
+			else                          {out_stream.put(garbage_byte_normal - 256);}
 			
 			file_size_for_overwriting++;
 			one_thousand_counter++;
