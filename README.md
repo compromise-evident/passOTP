@@ -1,7 +1,8 @@
-Run it: ```apt install g++ geany```. Open the .cpp in Geany. Hit F9 once. F5 to run.
+Run it: ```apt install g++ geany libgmp-dev libssl-dev```. Open the .cpp in Geany.<br>
+Append ```-lgmp -lcrypto``` to Geany's compile & build commands. Hit F9 once. F5 to run.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/compromise-evident/passOTP/refs/heads/main/Other/Terminal.png">
+  <img src="docs/terminal.png">
 </p>
 
 <br>
@@ -10,7 +11,14 @@ Run it: ```apt install g++ geany```. Open the .cpp in Geany. Hit F9 once. F5 to 
 # Perfect secrecy proof
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/compromise-evident/passOTP/main/Other/Perfect_secrecy_proof.png">
+  <img src="docs/perfect_secrecy_proof.png">
 </p>
 
 <sup>Original discoverer of the One-time pad (perfect secrecy) is not mentioned as I had independently rediscovered it ~December 2019</sup>
+
+<br>
+<br>
+
+# Security
+
+* Uses my https://github.com/compromise-evident/rolling-code
