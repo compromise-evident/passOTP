@@ -1,0 +1,13 @@
+Version 4.0.0   Secure (uses my rolling-code 5.0.1). Remastered. Basically, this
+                is a copy of groupOTP.cpp except for, where a key comes from.
+                2026_06_08
+
+Version 3.0.2   Randomness by the thousand, not million  (faster for files which
+                are not exactly n MB is size.)  File name safety  (append-only.)
+                Feb 6 2024
+
+Version 3.0.1   Prints progress in MB.
+                Feb 6 2024
+
+Version 3.0.0   Using rolling-code. Remastered. Was: "Multiway".
+                Feb 4 2024
