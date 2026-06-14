@@ -1,3 +1,5 @@
+Version 4.0.1   No dependencies for SHA-512.
+
 Version 4.0.0   Secure (uses my rolling-code 5.0.1). Remastered. Basically, this
                 is a copy of groupOTP.cpp except for, where a key comes from.
                 2026_06_08
